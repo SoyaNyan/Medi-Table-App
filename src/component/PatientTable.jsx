@@ -305,11 +305,13 @@ const PatientTable = ({ setFilterModel }) => {
 	}, [])
 
 	// dynamic page length control event
-	const onPageSizeChanged = useCallback(() => {
-		const value = document.getElementById("page-size").value
-		setPageSize(value)
-		gridApi.paginationSetPageSize(Number(value))
-	}, [gridApi])
+	const onPageSizeChanged = useCallback(
+		(e) => {
+			setPageSize(e.target.value)
+			gridApi.paginationSetPageSize(Number(e.target.value))
+		},
+		[gridApi]
+	)
 
 	// filter & sort reset button
 	const resetFilter = useCallback(() => {
@@ -344,8 +346,8 @@ const PatientTable = ({ setFilterModel }) => {
 			<div className="text-start mb-3">
 				<select
 					onChange={onPageSizeChanged}
-					defaultValue={10}
 					id="page-size"
+					value={pageSize}
 					style={{ fontSize: "1.2rem" }}
 				>
 					<option value="5">5 rows</option>
