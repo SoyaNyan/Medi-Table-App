@@ -3,14 +3,14 @@ import { Row, Col, Card } from "react-bootstrap"
 import Chart from "react-apexcharts"
 import { getRaceList, getEthnicityList, getGenderList, getPatientStats } from "../api/mediData"
 
-const ChartContainer = ({ isFilterChanged }) => {
+const ChartContainer = ({ filterModel }) => {
 	// for charts' labels
 	const [genderLabel, setGenderLabel] = useState([])
 	const [raceLabel, setRaceLabel] = useState([])
 	const [ethnicityLabel, setEthnicityLabel] = useState([])
 
 	// for charts' data
-	const [totalCount, setTotalCount] = useState(0)
+	// const [totalCount, setTotalCount] = useState(0)
 	const [chartData01, setChart01Data] = useState(null)
 	const [chartData02, setChart02Data] = useState(null)
 	const [chartData03, setChart03Data] = useState(null)
@@ -32,8 +32,8 @@ const ChartContainer = ({ isFilterChanged }) => {
 	useEffect(() => {
 		getPatientStats().then(({ stats }) => {
 			// total count
-			const total = stats.reduce((acc, curr) => acc + curr.count, 0)
-			setTotalCount(total)
+			// const total = stats.reduce((acc, curr) => acc + curr.count, 0)
+			// setTotalCount(total)
 
 			// Chart_01
 			const data01 = stats.reduce(
@@ -199,7 +199,7 @@ const ChartContainer = ({ isFilterChanged }) => {
 			]
 			setChart05Data(data05Arr)
 		})
-	}, [isFilterChanged])
+	}, [filterModel])
 
 	const CHART_01 = ({ data, label }) => {
 		const chartOptions = {

@@ -8,7 +8,7 @@ import "ag-grid-enterprise"
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-alpine.css"
 
-const PatientTable = ({ setIsFilterChanged }) => {
+const PatientTable = ({ setFilterModel }) => {
 	// responsive table
 	const gridRef = useRef()
 	const [gridApi, setGridApi] = useState(null)
@@ -22,6 +22,10 @@ const PatientTable = ({ setIsFilterChanged }) => {
 			serverSideStoreType: "partial",
 			domLayout: "autoHeight",
 			detailRowHeight: 400,
+			onFilterChanged: (e) => {
+				const filterModel = e.api.getFilterModel()
+				setFilterModel(filterModel)
+			},
 			onRowClicked: (e) => {
 				const { id: clickedRowIndex } = e.node
 				e.api.forEachNode((row) => {
@@ -33,7 +37,7 @@ const PatientTable = ({ setIsFilterChanged }) => {
 				e.api.getDisplayedRowAtIndex(Number(clickedRowIndex)).setExpanded(!e.node.expanded)
 			},
 		}),
-		[]
+		[setFilterModel]
 	)
 	const containerStyle = useMemo(() => ({ width: "100%", height: "100%" }), [])
 	const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), [])

@@ -6,7 +6,7 @@ import PatientTable from "./component/PatientTable"
 import ChartContainer from "./component/ChartContainer"
 
 function App() {
-	const [isFilterChanged, setIsFilterChanged] = useState(false)
+	const [filterModel, setFilterModel] = useState(null)
 
 	return (
 		<div className="App">
@@ -19,8 +19,8 @@ function App() {
 				</Container>
 			</Navbar>
 			<Container className="mt-3 h-50">
-				<ChartContainer isFilterChanged={isFilterChanged} />
-				<PatientTable setIsFilterChanged={setIsFilterChanged} />
+				<ChartContainer filterModel={filterModel} />
+				<PatientTable setFilterModel={setFilterModel} />
 			</Container>
 		</div>
 	)
