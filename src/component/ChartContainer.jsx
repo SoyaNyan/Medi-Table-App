@@ -17,6 +17,7 @@ const ChartContainer = ({ filterModel }) => {
 	const [chartData04, setChart04Data] = useState(null)
 	const [chartData05, setChart05Data] = useState(null)
 
+	// get legend for graph label text
 	useEffect(() => {
 		getGenderList().then(({ genderList }) => {
 			setGenderLabel(genderList)
@@ -29,6 +30,7 @@ const ChartContainer = ({ filterModel }) => {
 		})
 	}, [])
 
+	// get stats data for graphs
 	useEffect(() => {
 		getPatientStats().then(({ stats }) => {
 			// total count
@@ -201,6 +203,7 @@ const ChartContainer = ({ filterModel }) => {
 		})
 	}, [filterModel])
 
+	// chart components
 	const CHART_01 = ({ data, label }) => {
 		const chartOptions = {
 			options: {

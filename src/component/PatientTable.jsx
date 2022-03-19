@@ -14,6 +14,7 @@ const PatientTable = ({ setFilterModel }) => {
 	const [gridApi, setGridApi] = useState(null)
 	const [columnApi, setColumnApi] = useState(null)
 
+	// ag-grid options
 	const gridOptions = useMemo(
 		() => ({
 			masterDetail: true,
@@ -124,15 +125,18 @@ const PatientTable = ({ setFilterModel }) => {
 		}
 	}, [])
 
+	// child-row renderer
 	const detailCellRenderer = useMemo(() => {
 		return DetailCellRenderer
 	}, [])
 
+	// ag-grid ready
 	const onGridReady = useCallback((params) => {
 		setGridApi(params.api)
 		setColumnApi(params.columnApi)
 	}, [])
 
+	// prepare data source (SSRM)
 	useEffect(() => {
 		if (gridApi) {
 			const dataSource = {
@@ -262,6 +266,7 @@ const PatientTable = ({ setFilterModel }) => {
 						}
 					}
 
+					// call api
 					getPatientList({
 						page,
 						length: pageSize,
@@ -291,19 +296,22 @@ const PatientTable = ({ setFilterModel }) => {
 		}
 	}, [gridApi, pageSize])
 
+	// pre-opend child-row func
 	const onFirstDataRendered = useCallback((params) => {
 		// arbitrarily expand a row for presentational purposes
-		// setTimeout(function () {
-		// 	gridRef.current.api.getDisplayedRowAtIndex(0).setExpanded(true)
-		// }, 0)
+		setTimeout(function () {
+			gridRef.current.api.getDisplayedRowAtIndex(0).setExpanded(true)
+		}, 0)
 	}, [])
 
+	// dynamic page length control event
 	const onPageSizeChanged = useCallback(() => {
 		const value = document.getElementById("page-size").value
 		setPageSize(value)
 		gridApi.paginationSetPageSize(Number(value))
 	}, [gridApi])
 
+	// filter & sort reset button
 	const resetFilter = useCallback(() => {
 		// reset filtering model
 		const genderFilter = gridApi.getFilterInstance("gender")
