@@ -272,7 +272,7 @@ API에서 반환되는 리스트 데이터가 각 항목별로 집계된 데이�
 
 우선 `labels`에 제공할 범례 데이터를 먼저 얻기 위해서 제공된 API 중 3가지를 호출해서 로컬 `state` 에 저장하고 첫 3가지 차트에 각각 제공하고 뒤쪽의 복합 조건을 가진 차트에는 직접 string array로 `labels` 를 전달했습니다. `series` 에 제공될 데이터는 API를 호출하는 `useEffect()` 내에 리스트 데이터를 `reduce()` 를 통해 필요한 조건별로 집계하도록 구현했습니다.  이 때, 두번 째-네번 째, 세번 째, 다섯번 째 그래프는 각각 성별만 추가 조건으로 필터링하면 되기 때문에 한 번의 API 호출에서 각각 두 차트의 데이터를 모두 만들어 반환하도록 했습니다.
 
-```js
+```jsx
 return data ? (
     <div className="pie-chart">
         <Chart
@@ -291,8 +291,37 @@ return data ? (
 
 ### Q5. Q2에서 구현한 필터 설정에 따라 Q4의 그래프의 값을 수정합니다. (Timeout)
 
+마지막 문제인 테이블 필터링을 그래프 렌더링에 반영하는 것은 시간상의 문제와 제공되는 API에서 반환하는 집계 데이터를 적절하게 가공해서 환자 리스트 API를 호출하지 않고도 구현할 방법을 찾지 못해 구현하지 못했습니다. 해당 기능을 구현하기 위해서 생각했던 방법은 다음과 같습니다.
 
+1. `App.jsx` 에 `AG Grid` 테이블에서 필터링을 할 때 반환되는 `filterModel`을 저장할 state를 선언한다.
+2. 테이블 컴포넌트에 `filterModel` 을 쓸 수 있는 `setFilterModel` 메서드를 prop으로 전달하고 테이블에서 필터링을 할 때마다 실행되는 `onFilterChanged()` 이벤트 핸들러 내부에서 `setFilterModel(gridApi.getFilterModel())` 와 같이 `filterModel` 을 저장한다.
+3. 차트 컴포넌트에는 `filterModel` 을 prop으로 전달해 의존성을 만들고 차트 데이터 획득을 위해 API를 호출하는 `useEffect()` 에 `filterModel` 을 deps로 추가해 실제 필터링이 일어날 때마다 다시 API를 호출해 렌더링하게 하고 `filterModel` 로 부터 어떤 컬럼에 어떤 값의 필터가 설정 되어있는지를 얻어낸다.
+4. 필터값에 따라 stats 리스트 데이터를 필터링하고 재 가공해서 각 차트에 반영한다.
 
+```js
+// filterModel
+{
+    age: {
+    filter: 10
+    filterTo: 30
+    filterType: "number"
+    type: "inRange"
+    }
+    ethnicity: {
+        filterType: "set"
+        values: ['hispanic']
+    }
+    gender: {
+        filterType: "set"
+        values: ['M']
+    }
+    race: {
+        filterType: "set"
+        values: ['white']
+    }
+}
+```
 
+다만 이 방법은 API를 호출하는 `useEffect()` 에 지나치게 많은 책임을 부여하고 클라이언트 사이드에서 너무 많은 연산을 필요로 하고 stats 데이터를 넘겨주는 API에 각 항목에 대한 집계가 주어지는 편이 더 나은 구현이 가능했을 것으로 보입니다. 또 다른 방법으로는 환자 리스트 API를 호출해서 직접 필터링된 데이터셋 전체를 집계해서 차트에 반영하는 것인데 이 또한 비효율 적입니다.
 
 ## 아쉬웠던 점
