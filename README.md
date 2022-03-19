@@ -109,7 +109,7 @@ Svelte는 순수 자바스크립트를 확장시켜서 매우 단순한 문법�
 
 
 
-### Q0.  준비
+### Q0.  준비단계
 
 본격적으로 구현을 시작하기 전에 가장 핵심이 되는 라이브러리인 `AG Grid `와 `ApexCharts `의 공식 문서를 살펴 보았습니다. `ApexCharts` 는 이전에 다른 프로젝트에서 순수 자바스크립트 버전으로 사용할 적이 있기 때문에 React 환경에서 사용할 때 어떤 Component와 Prop을 제공하는지를 찾아봤습니다.
 
@@ -127,15 +127,102 @@ Swagger UI로 API의 명세가 제공되었기 때문에 각 `Endpoint` 의 파�
 
 테이블에 SSRM(Server-side Row Model) 옵션을 적용했기 때문에 클라이언트 측에서 데이터를 제공하는 기본 기능에서 추가로 필요한 옵션들이 많이 있었습니다. 그 중에서도 `rowModelType: "serverSide"` 옵션은 Enterprise License 에서만 사용 가능하며 `pagination: true` 옵션과 함께 사용할 경우 페이징이 제대로 동작하지 않는 경우가 있습니다. 이는 패키지 버전 `^25.0.1` 이후 변경된 것으로 ` serverSideStoreType: "partial"` 옵션으로 store 방식을 변경하지 않고 기본 값인 `full` 로 연동될 경우 모든 데이터를 한번에 가져오는 것으로 간주하여 현재 페이지를 알려주는 `endRow` 가 동작하지 않으므로 주의해야 합니다.
 
+```js
+// ag-grid options
+const gridOptions = useMemo(
+    () => ({
+        masterDetail: true,
+        pagination: true,
+        rowModelType: "serverSide", // only available on Enterprise License(include trial)
+        serverSideStoreType: "partial", // !important! required for SSRM pagination, sorting, filtering
+        domLayout: "autoHeight",
+        detailRowHeight: 400,
+        )
+    }),
+    [setFilterModel]
+)
+```
+
 공식 Github에 관련 이슈가 안내되어 있습니다. => [GitHub Issue](https://github.com/ag-grid/ag-grid/issues/4295)
+
+페이징과 정렬을 위해서 `AG Grid` 의 `columnDefs` 에서 정렬이 가능하게 할 컬럼을 지정하고, SSRM 데이터를 준비하는 `useEffect()` 내에서 `params` 로 전달되는 prop의 `endRow` , `sortModel` 값을 읽어 현재 페이지, 전체 레코드의 수, 그리고 테이블에서 어떤 컬럼의 정렬을 하려고 하는지를 알아내고 이를 API를 호출할 때 필요한 parameter로 매핑합니다.
+
+[ 정렬이 가능한 컬럼(API 명세를 따라) ]
+
+- 환자 id (personID)
+- 성별 (gender)
+- 생년월일 (birthDatetime)
+- 인종 (race)
+- 민족 (ethnicity)
+- 사망 여부 (isDeath)
+
+```js
+// pagination
+const page = endRow / pageSize
+
+// sorting
+const sortOptions = {
+    orderColumn: null,
+    orderDesc: false,
+}
+if (sortModel.length) {
+    const { colId, sort } = sortModel[0]
+    const columnInfo = {
+        personID: "person_id",
+        gender: "gender",
+        birthDatetime: "birth",
+        race: "race",
+        ethnicity: "ethnicity",
+        isDeath: "death",
+    }
+    sortOptions.orderColumn = columnInfo[colId]
+    sortOptions.orderDesc = sort === "desc"
+}
+```
 
 
 
 ### Q2. Q1에서 작성한 테이블의 필터 기능을 만듭니다. (Solved)
 
+이번 구현에서는 다음의 컬럼에서 필터링이 가능하도록 테이블을 수정해야 합니다.
 
+- 성별(gender)
+- 나이(age)
+- 인종(race)
+- 민족(ethnicity)
+- 사망 여부(death)
 
+이를 위해서 `AG Grid` 에서 제공하는 필터 컴포넌트를 활성화 하기 위해 `columnDefs` 옵션에 `filter: [filterClass]` 프로퍼티를 추가해야 합니다. 나이 컬럼을 제외한 나머지 컬럼은 모두 체크박스로 미리 지정된 항목을 선택 가능한 `agSetColumnFilter` 을 사용하고 필터링 옵션에 들어갈 항목은 각각의 리스트를 반환하는 API에 요청하여 동적으로 받을 수 있도록 구성했습니다. 나이는 환자의 리스트를 획득할 수 있는 API에서 `minAge` , `maxAge` 를 제공하므로 숫자 범위를 필터링 할 수 있는 `agNumberColumnFilter` 를 사용합니다.
 
+각 컬럼에 정의된 필터를 실제 데이터에 반여하기 위해서 SSRM 데이터를 준비하는 `useEffect()` 내에서 `params` 로 전달되는 prop의 `filterModel` 을 읽어 사용자가 어떤 컬럼에서 어떤 값을 기준으로 필터링을 하고자 하는 지를 알아내고 API를 호출하는 부분에서 필터 값과 필터링할 컬럼의 ID를 매핑해 줍니다.
+
+```js
+// call api
+getPatientList({
+    page,
+    length: pageSize,
+    orderColumn: sortOptions.orderColumn,
+    orderDesc: sortOptions.orderDesc,
+    gender: filterOptions.gender,
+    race: filterOptions.race,
+    ethnicity: filterOptions.ethnicity,
+    ageMin: filterOptions.ageMin,
+    ageMax: filterOptions.ageMax,
+    death: filterOptions.death,
+})
+    .then((data) => {
+    params.success({
+        rowData: data.patient.list,
+        rowCount: data.patient.totalLength,
+    })
+})
+    .catch((err) => {
+    console.log(err)
+    params.fail()
+})
+```
+
+이 과정에서 API의 `parameter` 가 사전에 정해져 있기 때문에 발생하는 문제가 있었는데, `AG Grid` 의 필터 기능은 한 컬럼에서 여러 개의 값을 동시에 `And` 나 `Or` 연산으로 복합 조건 검색이 가능하지만 API 엔드포인트에서 지원되지 않기 때문에 한 번에 두 개 이상의 필터를 `agSetColumnFilter` 에서 선택하거나 `minAge` , `maxAge` 값을 추출할 수 있는 조건이 아닌 항목을 `agNumberColumnFilter` 에서 선택할 때 해당하는 데이터를 반환해 줄 수 없었습니다. 클라이언트 측에서 여러번 API를 호출하여 데이터를 Merge 하는 방법도 있었지만 그렇게 되면 SSRM 사용의 목적이 무색해 지기 때문에 적절한 메시지를 사용자에게 출력하고 해당 컬럼의 `filter` 를 초기화하는 것으로 했습니다.
 
 ### Q3. 목록에서 환자 클릭 시 상세 정보를 child-row에 보여줍니다. (Solved)
 
@@ -153,3 +240,6 @@ Swagger UI로 API의 명세가 제공되었기 때문에 각 `Endpoint` 의 파�
 
 
 
+
+
+## 아쉬웠던 점
