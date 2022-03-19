@@ -1,70 +1,76 @@
-# Getting Started with Create React App
+# Medical Table App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+이 프로젝트는 CRA(Create React App)으로 만들어졌습니다.
 
 ## Available Scripts
 
-In the project directory, you can run:
-
 ### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+프로젝트를 개발환경으로 로컬에서 호스팅하려면 위 스크립트를 실행해주세요.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+프로젝트를 build 하려면 위 스크립트를 실행해주세요.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### `npm run start:prod`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+build된 프로젝트를 로컬에서 호스팅하려면 위 스크립트를 실행해주세요.
+Production build를 호스팅하려면 먼저 `npm install -g serve` 를 통해 serve 패키지를 설치해주세요.
 
-### `npm run eject`
+## Project Structure
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+프로젝트의 디렉토리 구조는 다음과 같습니다.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```txt
+root
+|   .env
+|   .gitignore
+|   output.txt
+|   package-lock.json
+|   package.json
+|   README.md
+|   tree.txt
++---build
+|   |
+|   \ ...
++---node_modules
+|   |
+|   \ ...
++---public
+|       favicon.ico
+|       index.html
+|       logo192.png
+|       logo512.png
+|       manifest.json
+|       robots.txt
+|
+\---src
+    |   App.css
+    |   App.jsx
+    |   App.test.js
+    |   custom.css
+    |   index.css
+    |   index.js
+    |   logo.svg
+    |   reportWebVitals.js
+    |   setupTests.js
+    |
+    +---api
+    |       mediData.js
+    |
+    \---component
+            ChartContainer.jsx
+            DetailCellRenderer.jsx
+            PatientTable.jsx
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+프로젝트를 실행하기 위해서는 API 서버의 주소를 `.env` 파일에 작성해야 합니다.
+`.env` 파일을 생성하고 내부에 다음과 같이 환경변수를 작성하세요.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```txt
+# CRA requires REACT_APP_ prefix
+REACT_APP_API_BASE_ADDR=[API_ADRESS_HERE]
+```
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+> CRA로 생성된 프로젝트에는 `dotenv` 패키지가 이미 설치되어 있습니다. 다만, `.env` 파일 내부에 `REACT_APP_` 접미사가 붙은 환경변수 만을 정상적으로 불러 올 수 있으니 `process.env` 에서 원하는 환경변수를 불러올 수 없을 경우 이 규칙을 지켜야 합니다.
