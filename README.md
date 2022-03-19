@@ -1,6 +1,6 @@
 # Medical Table App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).  
 이 프로젝트는 CRA(Create React App)으로 만들어졌습니다.
 
 ## Available Scripts
@@ -15,7 +15,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ### `npm run start:prod`
 
-build된 프로젝트를 로컬에서 호스팅하려면 위 스크립트를 실행해주세요.
+build된 프로젝트를 로컬에서 호스팅하려면 위 스크립트를 실행해주세요.  
 Production build를 호스팅하려면 먼저 `npm install -g serve` 를 통해 serve 패키지를 설치해주세요.
 
 ## Project Structure
@@ -65,7 +65,7 @@ root
             PatientTable.jsx
 ```
 
-프로젝트를 실행하기 위해서는 API 서버의 주소를 `.env` 파일에 작성해야 합니다.
+프로젝트를 실행하기 위해서는 API 서버의 주소를 `.env` 파일에 작성해야 합니다.  
 `.env` 파일을 생성하고 내부에 다음과 같이 환경변수를 작성하세요.
 
 ```txt
